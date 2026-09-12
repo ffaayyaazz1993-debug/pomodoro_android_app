@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="pomodoro_red">#FFE53935</color>
+    <color name="pomodoro_red_dark">#FFC62828</color>
+    <color name="pomodoro_green">#FF43A047</color>
+    <color name="pomodoro_green_dark">#FF2E7D32</color>
+    <color name="pomodoro_blue">#FF1E88E5</color>
+    <color name="pomodoro_blue_dark">#FF1565C0</color>
+    <color name="pomodoro_orange">#FFFB8C00</color>
+    <color name="pomodoro_purple">#FF6750A4</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+    <color name="surface_light">#FFFFFBFF</color>
+    <color name="surface_dark">#FF201A1A</color>
+    <color name="on_surface_light">#FF201A1A</color>
+    <color name="on_surface_dark">#FFECE0DF</color>
+</resources>

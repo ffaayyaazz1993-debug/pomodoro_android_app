@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="start_focus"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_media_play"
+        android:shortcutShortLabel="@string/shortcut_start_focus"
+        android:shortcutLongLabel="@string/shortcut_start_focus">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.example.pomodoro"
+            android:targetClass="com.example.pomodoro.MainActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="new_task"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_menu_add"
+        android:shortcutShortLabel="@string/shortcut_new_task"
+        android:shortcutLongLabel="@string/shortcut_new_task">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.example.pomodoro"
+            android:targetClass="com.example.pomodoro.MainActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="open_timer"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_menu_recent_history"
+        android:shortcutShortLabel="@string/shortcut_open_timer"
+        android:shortcutLongLabel="@string/shortcut_open_timer">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.example.pomodoro"
+            android:targetClass="com.example.pomodoro.MainActivity" />
+    </shortcut>
+</shortcuts>
