@@ -78,8 +78,8 @@ function OverviewSection() {
         <h2 className="text-3xl font-bold mb-4">Project Overview</h2>
         <p className="text-gray-300 text-lg leading-relaxed">
           PomodoroFocus is a complete, production-quality Android Pomodoro productivity application 
-          built with modern Android development practices. It features a robust timer engine, 
-          task management, project tracking, statistics, and full Android platform integration.
+          built with modern Android development practices. It features <strong className="text-white">per-task independent timers</strong> that 
+          run simultaneously, full project management, a flexible tag system, statistics, and complete Android platform integration.
         </p>
       </div>
 
@@ -97,6 +97,21 @@ function OverviewSection() {
           <PrincipleItem icon="🔒" title="Offline-First" desc="No internet required. No accounts. No cloud. All data stays on device." />
           <PrincipleItem icon="📱" title="Android-Native" desc="Foreground service, notifications, widgets, shortcuts. Follows Material 3 guidelines." />
         </div>
+      </div>
+
+      <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
+        <h3 className="text-lg font-semibold mb-3">Per-Task Timers Demo</h3>
+        <p className="text-gray-400 text-sm mb-4">
+          Each task gets its own independent timer. Multiple timers run simultaneously.
+        </p>
+        <div className="space-y-3">
+          <TaskTimerDemo task="Write report" time="17:32" phase="Focus" status="running" progress={0.3} />
+          <TaskTimerDemo task="Fix bug #42" time="08:15" phase="Focus" status="paused" progress={0.67} />
+          <TaskTimerDemo task="Code review" time="22:45" phase="Focus" status="running" progress={0.1} />
+        </div>
+        <p className="text-gray-500 text-xs mt-3">
+          ↑ Each timer runs independently. Pausing one doesn't affect the others.
+        </p>
       </div>
 
       <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
@@ -139,6 +154,25 @@ function ArchitectureSection() {
           <div className="flex justify-center"><Arrow /></div>
           <ArchLayer name="Android Services" desc="Foreground Service, Notifications, Receivers, Widgets" color="from-orange-500 to-orange-600" />
         </div>
+      </div>
+
+      <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
+        <h3 className="text-lg font-semibold mb-4">Multi-Timer Architecture</h3>
+        <p className="text-gray-300 mb-4">
+          Each task gets its own independent <code className="text-red-400">TimerEngine</code> instance managed by <code className="text-red-400">MultiTimerManager</code>. 
+          Timers run simultaneously and independently - pausing Task 1 doesn't affect Task 2.
+        </p>
+        <div className="bg-gray-950 rounded-lg p-4 font-mono text-sm text-green-400 mb-4">
+          <div>MultiTimerManager</div>
+          <div className="ml-4">├── Task #1 → TimerEngine (key: timer_task_1)</div>
+          <div className="ml-4">├── Task #2 → TimerEngine (key: timer_task_2)</div>
+          <div className="ml-4">├── Task #3 → TimerEngine (key: timer_task_3)</div>
+          <div className="ml-4">└── Global → TimerEngine (key: timer_global)</div>
+        </div>
+        <p className="text-gray-400 text-sm">
+          Each timer persists its state independently using unique keys in the app_state table. 
+          This allows full recovery after process death for each task's timer.
+        </p>
       </div>
 
       <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
@@ -185,27 +219,49 @@ function FeaturesSection() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <FeatureGroup title="⏱️ Timer Engine" features={[
-          'Timestamp-based accuracy',
+        <FeatureGroup title="⏱️ Per-Task Timer Engine" features={[
+          'Independent timer per task',
+          'Multiple timers run simultaneously',
+          'Each task has its own countdown',
+          'Pause one without affecting others',
+          'Timestamp-based accuracy per timer',
           'Background execution via Foreground Service',
-          'Process death recovery',
-          'Boot recovery',
-          'Doze/screen-off support',
-          'Configurable durations',
-          'Add/subtract time',
+          'Process death recovery per task',
           'Cycle logic with long break intervals',
-          'Auto-start options',
+          'Add/subtract time per task',
         ]} />
         <FeatureGroup title="✅ Task Management" features={[
           'Create, edit, delete tasks',
           'Priority levels (LOW → CRITICAL)',
           'Status tracking',
-          'Estimated Pomodoros',
+          'Estimated vs completed Pomodoros',
           'Due dates',
-          'Tags system',
+          'Tags system (create, assign, filter)',
           'Search and filtering',
           'Project association',
-          'Archive/completion',
+          'Per-task timer with live progress',
+        ]} />
+        <FeatureGroup title="📁 Projects" features={[
+          'Create and manage projects',
+          'Color-coded project cards',
+          'Associate tasks with projects',
+          'Filter tasks by project',
+          'Project-level statistics',
+          'Status tracking (Active/Paused/Completed)',
+          'Task counts per project',
+          'Project Pomodoro totals',
+          'Project detail view',
+        ]} />
+        <FeatureGroup title="🏷️ Tags" features={[
+          'Create custom tags',
+          'Assign multiple tags per task',
+          'Filter tasks by tag',
+          'Rename tags',
+          'Tag management dialog',
+          'Visual tag chips on tasks',
+          'Tag-based search',
+          'Color-coded tag display',
+          'Quick tag creation',
         ]} />
         <FeatureGroup title="📊 Statistics" features={[
           'Daily/weekly/monthly views',
@@ -327,6 +383,7 @@ function StructureSection() {
     { path: 'app/src/main/java/.../data/repository/*.kt', desc: 'Data repositories' },
     { path: 'app/src/main/java/.../data/preferences/AppPreferences.kt', desc: 'DataStore preferences' },
     { path: 'app/src/main/java/.../domain/timer/TimerEngine.kt', desc: 'Core timer state machine' },
+    { path: 'app/src/main/java/.../domain/timer/MultiTimerManager.kt', desc: 'Per-task independent timers' },
     { path: 'app/src/main/java/.../domain/usecase/StatisticsUseCase.kt', desc: 'Statistics computations' },
     { path: 'app/src/main/java/.../service/TimerForegroundService.kt', desc: 'Background timer service' },
     { path: 'app/src/main/java/.../service/NotificationService.kt', desc: 'Notification management' },
@@ -337,6 +394,7 @@ function StructureSection() {
     { path: 'app/src/main/java/.../widget/PomodoroWidget.kt', desc: 'Home screen widget' },
     { path: 'app/src/main/java/.../util/*.kt', desc: 'Utilities and exporters' },
     { path: 'app/src/test/java/.../domain/timer/TimerEngineTest.kt', desc: 'Timer engine tests' },
+    { path: 'app/src/test/java/.../domain/timer/MultiTimerManagerTest.kt', desc: 'Multi-timer tests' },
     { path: 'app/src/test/java/.../util/TimeUtilsTest.kt', desc: 'Utility tests' },
     { path: 'app/src/main/res/', desc: 'Resources (strings, themes, drawables, xml)' },
   ]
@@ -363,10 +421,10 @@ function StructureSection() {
       <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
         <h3 className="text-lg font-semibold mb-4">Source Statistics</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatItem label="Kotlin Files" value="25+" />
-          <StatItem label="Lines of Code" value="4000+" />
-          <StatItem label="Unit Tests" value="30+" />
-          <StatItem label="UI Screens" value="12" />
+          <StatItem label="Kotlin Files" value="30+" />
+          <StatItem label="Lines of Code" value="5500+" />
+          <StatItem label="Unit Tests" value="45+" />
+          <StatItem label="UI Screens" value="13" />
         </div>
       </div>
     </div>
@@ -408,6 +466,31 @@ function TestingSection() {
             'Completed pomodoros in cycle increments',
             'Multiple pauses accumulate correctly',
             'Pause/skip/stop when idle does nothing',
+          ].map((test, i) => (
+            <div key={i} className="flex items-center gap-2 text-sm">
+              <span className="text-green-400">✓</span>
+              <span className="text-gray-300">{test}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
+        <h3 className="text-lg font-semibold mb-4">Multi-Timer Manager Tests</h3>
+        <div className="space-y-2">
+          {[
+            'Initially no active timers',
+            'Starting timer for task creates timer',
+            'Multiple tasks can have independent timers',
+            'Pausing one timer does not affect others',
+            'Each task timer tracks time independently',
+            'Stopping a timer removes it from active set',
+            'Completing a timer updates state correctly',
+            'Removing a timer cleans up',
+            'getTimer returns global timer when taskId is null',
+            'Resuming paused timer works correctly',
+            'Adding time to one timer does not affect others',
+            'Each task timer has independent cycle count',
           ].map((test, i) => (
             <div key={i} className="flex items-center gap-2 text-sm">
               <span className="text-green-400">✓</span>
@@ -579,6 +662,27 @@ function StatItem({ label, value }: { label: string; value: string }) {
     <div className="text-center">
       <div className="text-2xl font-bold text-red-400">{value}</div>
       <div className="text-xs text-gray-500">{label}</div>
+    </div>
+  )
+}
+
+function TaskTimerDemo({ task, time, phase, status, progress }: { task: string; time: string; phase: string; status: string; progress: number }) {
+  const statusColor = status === 'running' ? 'bg-green-500' : status === 'paused' ? 'bg-yellow-500' : 'bg-gray-500'
+  return (
+    <div className="bg-gray-950 rounded-lg p-3 border border-gray-800">
+      <div className="flex items-center gap-3">
+        <div className={`w-2 h-2 rounded-full ${statusColor} animate-pulse`} />
+        <div className="flex-1 min-w-0">
+          <div className="text-sm font-medium text-gray-200 truncate">{task}</div>
+          <div className="text-xs text-gray-500">{phase} • {status}</div>
+        </div>
+        <div className="text-right">
+          <div className="text-lg font-mono font-bold text-red-400">{time}</div>
+        </div>
+      </div>
+      <div className="mt-2 h-1 bg-gray-800 rounded-full overflow-hidden">
+        <div className="h-full bg-red-500 rounded-full transition-all" style={{ width: `${progress * 100}%` }} />
+      </div>
     </div>
   )
 }

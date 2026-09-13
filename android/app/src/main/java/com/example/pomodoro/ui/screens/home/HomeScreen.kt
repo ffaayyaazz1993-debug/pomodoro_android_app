@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.example.pomodoro.PomodoroApplication
 import com.example.pomodoro.domain.timer.TimerPhase
 import com.example.pomodoro.domain.timer.TimerState
+import com.example.pomodoro.domain.timer.MultiTimerManager
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -30,6 +31,9 @@ fun HomeScreen(
     val timerState by app.timerEngine.state.collectAsState()
     val tasks by app.taskRepository.getAllActiveTasks().collectAsState(initial = emptyList())
     val projects by app.projectRepository.getAllActiveProjects().collectAsState(initial = emptyList())
+    val multiTimerManager = app.multiTimerManager
+    val activeTimerIds by multiTimerManager.activeTimerIds.collectAsState()
+    val activeTimers = remember(activeTimerIds) { multiTimerManager.getActiveTimers() }
 
     val todayStart = remember {
         Calendar.getInstance().apply {
@@ -153,6 +157,82 @@ fun HomeScreen(
                     value = "${tasks.count { it.status == "COMPLETED" }}",
                     label = "Tasks Done"
                 )
+            }
+        }
+
+        // Active per-task timers
+        if (activeTimers.isNotEmpty()) {
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Active Timers (${activeTimers.size})",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    TextButton(onClick = onNavigateToTimer) {
+                        Text("View all")
+                    }
+                }
+            }
+
+            items(activeTimers.take(3), key = { "timer_${it.first}" }) { (taskId, engine) ->
+                val task = tasks.find { it.id == taskId }
+                val tState by engine.state.collectAsState()
+                val remMs by produceState(initialValue = engine.computeRemainingMs(), tState) {
+                    while (true) {
+                        value = engine.computeRemainingMs()
+                        kotlinx.coroutines.delay(1000)
+                    }
+                }
+                val remMin = remMs / 60000
+                val remSec = (remMs % 60000) / 1000
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                    ),
+                    onClick = onNavigateToTimer
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Surface(
+                            modifier = Modifier.size(8.dp),
+                            shape = MaterialTheme.shapes.small,
+                            color = if (tState.isRunning) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+                        ) {}
+                        Spacer(Modifier.width(12.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = task?.title ?: "Task #$taskId",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Text(
+                                text = when (tState.phase) {
+                                    TimerPhase.FOCUS -> "Focus"
+                                    TimerPhase.SHORT_BREAK -> "Short Break"
+                                    TimerPhase.LONG_BREAK -> "Long Break"
+                                    else -> ""
+                                } + if (tState.isPaused) " • Paused" else "",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Text(
+                            text = String.format("%02d:%02d", remMin, remSec),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
             }
         }
 

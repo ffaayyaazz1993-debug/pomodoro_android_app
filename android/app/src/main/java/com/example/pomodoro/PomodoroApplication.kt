@@ -13,6 +13,7 @@ import com.example.pomodoro.data.repository.GoalRepository
 import com.example.pomodoro.domain.timer.TimerEngine
 import com.example.pomodoro.domain.timer.TimerRepository
 import com.example.pomodoro.domain.timer.SystemClock
+import com.example.pomodoro.domain.timer.MultiTimerManager
 
 class PomodoroApplication : Application() {
 
@@ -21,6 +22,8 @@ class PomodoroApplication : Application() {
     lateinit var appPreferences: AppPreferences
         private set
     lateinit var timerEngine: TimerEngine
+        private set
+    lateinit var multiTimerManager: MultiTimerManager
         private set
 
     // Repositories
@@ -40,8 +43,16 @@ class PomodoroApplication : Application() {
         // Initialize preferences
         appPreferences = AppPreferences(this)
 
-        // Initialize timer engine
+        // Initialize timer engine (legacy single timer - kept for backward compatibility)
         timerEngine = TimerEngine(
+            clock = SystemClock(),
+            timerRepository = timerRepository,
+            sessionRepository = sessionRepository,
+            preferences = appPreferences
+        )
+
+        // Initialize multi-timer manager (per-task independent timers)
+        multiTimerManager = MultiTimerManager(
             clock = SystemClock(),
             timerRepository = timerRepository,
             sessionRepository = sessionRepository,

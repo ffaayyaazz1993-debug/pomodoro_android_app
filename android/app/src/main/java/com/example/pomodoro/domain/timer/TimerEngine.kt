@@ -85,12 +85,12 @@ class FakeClock(
 /**
  * Repository interface for timer persistence.
  */
-class TimerRepository(private val appStateDao: AppStateDao) {
+open class TimerRepository(val appStateDao: AppStateDao) {
     companion object {
         const val KEY_TIMER_STATE = "timer_state"
     }
 
-    suspend fun saveTimerState(snapshot: TimerSnapshot) {
+    open suspend fun saveTimerState(snapshot: TimerSnapshot) {
         val json = JSONObject().apply {
             put("state", snapshot.state.name)
             put("phase", snapshot.phase.name)
@@ -112,7 +112,7 @@ class TimerRepository(private val appStateDao: AppStateDao) {
         )
     }
 
-    suspend fun loadTimerState(): TimerSnapshot? {
+    open suspend fun loadTimerState(): TimerSnapshot? {
         val entity = appStateDao.getValue(KEY_TIMER_STATE) ?: return null
         return try {
             val json = JSONObject(entity.value)
@@ -137,7 +137,7 @@ class TimerRepository(private val appStateDao: AppStateDao) {
         }
     }
 
-    suspend fun clearTimerState() {
+    open suspend fun clearTimerState() {
         appStateDao.delete(KEY_TIMER_STATE)
     }
 }

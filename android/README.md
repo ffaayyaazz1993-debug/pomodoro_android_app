@@ -5,6 +5,8 @@ A complete, production-quality Android Pomodoro productivity application built w
 ## Features
 
 ### Core Timer
+- **Per-task independent timers** - Each task gets its own timer that runs simultaneously with others
+- **Multi-timer manager** - Manage multiple concurrent timers, one per task
 - **Timestamp-based timer engine** - Accurate timing using monotonic timestamps, not counters
 - **Background execution** - Foreground service keeps timer running when app is backgrounded
 - **Process death recovery** - Timer state persists and reconstructs correctly after process death
@@ -15,12 +17,28 @@ A complete, production-quality Android Pomodoro productivity application built w
 
 ### Task Management
 - Full CRUD operations for tasks
+- **Per-task timer** - Start/stop/pause timer directly from task
 - Priority levels (LOW, MEDIUM, HIGH, CRITICAL)
 - Status tracking (NOT_STARTED, IN_PROGRESS, COMPLETED, CANCELLED, ARCHIVED)
-- Estimated vs completed Pomodoros
-- Due dates and tags
+- Estimated vs completed Pomodoros with visual progress
+- Due dates
 - Search and filtering
-- Project association
+
+### Projects
+- Create and manage projects with color coding
+- Associate tasks with projects
+- Filter tasks by project
+- Project-level statistics (task counts, Pomodoros, focus time)
+- Status tracking (ACTIVE, PAUSED, COMPLETED, ARCHIVED)
+- Project detail view with task list
+
+### Tags
+- Create custom tags (e.g., Coding, Study, Writing)
+- Assign multiple tags per task
+- Filter tasks by tag
+- Rename and delete tags
+- Visual tag chips on task cards
+- Tag management dialog
 
 ### Projects
 - Create and manage projects
@@ -96,6 +114,23 @@ app/src/main/java/com/example/pomodoro/
 ```
 
 ### Timer Architecture
+
+#### Per-Task Independent Timers
+
+Each task gets its own `TimerEngine` instance managed by `MultiTimerManager`. 
+Timers run simultaneously and independently - pausing Task 1 doesn't affect Task 2.
+
+```
+MultiTimerManager
+├── Task #1 → TimerEngine (persisted key: timer_task_1)
+├── Task #2 → TimerEngine (persisted key: timer_task_2)
+├── Task #3 → TimerEngine (persisted key: timer_task_3)
+└── Global  → TimerEngine (persisted key: timer_global)
+```
+
+Each timer persists its state independently using unique keys in the `app_state` table.
+
+#### Timestamp-Based Calculation
 
 The timer engine uses **timestamp-based calculation** for accuracy:
 
