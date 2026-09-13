@@ -16,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.pomodoro.ui.screens.home.HomeScreen
 import com.example.pomodoro.ui.screens.timer.TimerScreen
+import com.example.pomodoro.ui.screens.timer.MultiTimerScreen
 import com.example.pomodoro.ui.screens.tasks.TasksScreen
 import com.example.pomodoro.ui.screens.tasks.TaskDetailScreen
 import com.example.pomodoro.ui.screens.projects.ProjectsScreen
@@ -53,8 +54,10 @@ fun PomodoroNavHost(
                 )
             }
             composable(Screen.Timer.route) {
-                TimerScreen(
-                    onNavigateToFocusMode = { navController.navigate(Screen.FocusMode.route) },
+                MultiTimerScreen(
+                    onNavigateToTask = { taskId ->
+                        navController.navigate("task_detail/$taskId")
+                    },
                     onNavigateToTasks = { navController.navigate(Screen.Tasks.route) }
                 )
             }
